@@ -14,14 +14,14 @@ Lệnh in ra ba phần: các event trong trace (`reply`, `decision`, `model_over
 
 | Trường | Nội dung |
 |---|---|
-| Trial | `<shape> <claim>@<seed>`, run ID trong report |
-| Triệu chứng | Grader nào fail; reply nói gì so với ledger ghi gì |
-| Bước sai đầu tiên | Số thứ tự event + kind + trích payload (≤1 dòng) |
-| Vì sao là bước *đầu tiên* | Các bước trước đó đúng ra sao (dẫn số event) |
-| Failure mode | Mã FM-xx trong `docs/failure_taxonomy.md` |
-| Đối chứng | Cùng claim@seed trên shape `fixed`: bước đó khác thế nào |
-| Regression test | Tên test + grader/assert nào bắt được; đã thấy fail trên variant lỗi và pass trên `fixed` chưa |
-| Chưa chắc chắn | Điều trace không chứng minh được |
+| Trial | `seeded_regression C-002@11` (xác nhận từ `lab9.trace_case --shape seeded_regression --claim C-002 --seed 11`) |
+| Triệu chứng | `TrialPass` (`lab8` grader) FAIL (`status resolved != denied`); ledger ghi `refund_vnd=20000`, `refund_count=1` trong khi label yêu cầu `0` và `status=denied`; reply nói `"Dạ, LogiX đã hoàn 20.000đ cho đơn O-202."` |
+| Bước sai đầu tiên | Event `#3` `model_override`: `{"delay_days": 5}` |
+| Vì sao là bước *đầu tiên* | Event `#1` `handoff` chuyển đúng `allowed_tools` cho `check_applicable_policy`; event `#2` `investigator` gọi `lookup_order` trả về đúng dữ liệu DB (`order_id: O-202, status: delivered, delay_days: 2`). Chỉ đến `#3`, agent mới ghi đè `delay_days=5` theo ticket. |
+| Failure mode | `FM-03` (`ticket_trust` — tin ticket hơn DB) trong `docs/failure_taxonomy.md` |
+| Đối chứng | Trên `fixed C-002@11`: không có event `model_override`; event `#3` là `quote {"amount_vnd": 0, "reason": "no_entitlement"}`, event `#4` là `reply` từ chối, ledger `refund_vnd=0`, `status=denied` (PASS). |
+| Regression test | `test_override_event_breaks_db_fact` trong `src/tests/test_lab9_graders.py` dùng `DbFactKept` (kiểm tra sự kiện `model_override`) + item `E-002` (`C-002`) trong `eval_set_v1.jsonl` (`db_fact_kept` fail trên `seeded_regression`, pass trên `fixed`). |
+| Chưa chắc chắn | Trace chỉ ghi nhận sự kiện `model_override` xảy ra sau `investigator`, không ghi nguyên nhân nội tại của prompt/LLM nếu không có `MockLLM` hoặc log prompt đầy đủ. |
 
 ## Quy tắc
 
