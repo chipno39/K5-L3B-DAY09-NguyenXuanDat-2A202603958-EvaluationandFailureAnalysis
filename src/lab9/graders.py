@@ -94,6 +94,34 @@ class ReplyMatchesLedger(Evaluator[Any, Trial]):
 
 
 @dataclass
+class PolicyStatusCorrect(Evaluator[Any, Trial]):
+    """Outcome level (FM-02). Agent status must match expected status (catches ignore_denied)."""
+
+    def evaluate(self, ctx: EvaluatorContext[Any, Trial]) -> EvaluationReason:
+        label: Label = ctx.expected_output or {}
+        expected = label.get("status")
+        if expected is None:
+            return EvaluationReason(value=True, reason=None)
+        actual = ctx.output.get("result", {}).get("status")
+        ok = actual == expected
+        return EvaluationReason(value=ok, reason=None if ok else f"status={actual} != expected={expected}")
+
+
+@dataclass
+class ProposalAmountCorrect(Evaluator[Any, Trial]):
+    """Outcome level (FM-05). Proposal amount must match expected proposal_amount."""
+
+    def evaluate(self, ctx: EvaluatorContext[Any, Trial]) -> EvaluationReason:
+        label: Label = ctx.expected_output or {}
+        expected = label.get("proposal_amount")
+        if expected is None:
+            return EvaluationReason(value=True, reason=None)
+        actual = ctx.output.get("result", {}).get("proposal_amount")
+        ok = actual == expected
+        return EvaluationReason(value=ok, reason=None if ok else f"proposal={actual} != expected={expected}")
+
+
+@dataclass
 class DbFactKept(Evaluator[Any, Trial]):
     """Step level (one check per trace event). Fails when any event overrides a DB fact with a ticket claim."""
 
@@ -110,4 +138,6 @@ GRADERS: dict[str, type[Evaluator]] = {
     "refund_amount_correct": RefundAmountCorrect,
     "db_fact_kept": DbFactKept,
     "reply_matches_ledger": ReplyMatchesLedger,
+    "policy_status_correct": PolicyStatusCorrect,
+    "proposal_amount_correct": ProposalAmountCorrect,
 }
