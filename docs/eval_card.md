@@ -3,7 +3,7 @@
 Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10.
 
 ## v1 (Core)
-- **Run ID / eval set SHA:** Baseline `E-swarm-20261118-5949`, `fixed` `E-fixed-20261118-5949`, `seeded_regression` `E-seeded_regression-20261118-5949` · eval set `v1` SHA `594991b3415a`
+- **Run ID / eval set SHA:** Baseline `E-swarm-20261118-6fe7`, `fixed` `E-fixed-20261118-6fe7`, `seeded_regression` `E-seeded_regression-20261118-6fe7` · eval set `v1` SHA `6fe7971d5bbb`
 - **Phiên bản:** `metric_spec_version: "1.0"` · `eval_set_version: v1` · seeds `11, 22, 33, 44, 55` · `MockLLM`
 - **Eval set:** `v1`, 14 item × 5 seed, nguồn `lab8_public`; nhãn tách riêng tại `src/data/eval/labels_v1.json`
 - **Metric & ngưỡng (`config/metric_spec.yaml`):**
@@ -30,7 +30,7 @@ Card này đi kèm mỗi báo cáo và được dùng lại ở Day 10.
 - **Khi nào tăng eval-set version:** Khi bổ sung item từ trace case hoặc adversarial pack (như v2), hoặc thay đổi phân bố claim.
 
 ## v2 (Advanced & Expert)
-- **Run ID / eval set SHA:** Baseline v2 `E-swarm-20261118-378e` · eval set `v2` SHA `378eda0ad450` (`28 item × 5 seed`, gồm 14 item v1 + 14 adversarial item trong `adversarial_v2.json`).
+- **Run ID / eval set SHA:** Baseline v2 `E-swarm-20261118-a9b5` · eval set `v2` SHA `a9b56c645a39` (`28 item × 5 seed`, gồm 14 item v1 + 14 adversarial item trong `adversarial_v2.json`).
 - **Ngưỡng chọn từ A/A (`--aa 66,77,88,99,110`):** Trên `MockLLM`, A/A cho `Δ = +0.0000` ở mọi metric (`pass_hat_5 = 0.8929`). Với LLM thật, nhiễu tự nhiên khiến dải Δ > 0 nên sàn blocking phải đặt ngoài dải nhiễu A/A để tránh báo nhầm. Chọn `pass_hat_5` `min: 0.85` (≥ 0.80 theo rubric và dưới mức baseline `0.8929`), đủ chặn `flaky_regression` (lỗi làm tròn 1/5 seed) mà không chặn nhầm `fixed` / `honest_refactor`.
 - **Slice gate:**
   - `money_movement` (`refund_amount_correct`, `min: 0.90`, `no_significant_drop: true`): chặn `slice_regression` (`0.85`, Δ `-0.150` CI `[-0.300, +0.000]` **BLOCK**) trong khi `pass_rate` trung bình toàn tập (`0.9357`, CI `[-0.121, +0.029]`) vẫn vượt sàn.
